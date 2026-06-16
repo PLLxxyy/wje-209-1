@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/api.ts","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/pages/createmeetup.tsx","./src/pages/login.tsx","./src/pages/meetupdetail.tsx","./src/pages/profile.tsx","./src/pages/register.tsx","./src/pages/square.tsx"],"version":"5.9.3"}
