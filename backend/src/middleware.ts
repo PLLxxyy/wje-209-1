@@ -27,3 +27,17 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
     res.status(401).json({ error: '登录已过期，请重新登录' });
   }
 }
+
+export function optionalAuthMiddleware(req: AuthRequest, _res: Response, next: NextFunction): void {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.slice(7);
+    try {
+      const payload = jwt.verify(token, JWT_SECRET) as { userId: number };
+      req.userId = payload.userId;
+    } catch {
+      // token 无效，忽略
+    }
+  }
+  next();
+}

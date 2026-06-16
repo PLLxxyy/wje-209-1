@@ -44,6 +44,16 @@ db.exec(`
     FOREIGN KEY (user_id) REFERENCES users(id),
     UNIQUE(meetup_id, user_id)
   );
+
+  CREATE TABLE IF NOT EXISTS favorites (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    meetup_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (meetup_id) REFERENCES meetups(id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE(meetup_id, user_id)
+  );
 `);
 
 export default db;

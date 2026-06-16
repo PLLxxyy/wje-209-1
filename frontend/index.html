@@ -703,6 +703,40 @@
 
     .back-btn:hover { color: var(--primary); }
 
+    /* ========== Favorite Button ========== */
+    .favorite-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 15px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+      font-family: inherit;
+      line-height: 1;
+    }
+
+    .favorite-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #FFF7F3;
+    }
+
+    .favorite-btn.favorited {
+      background: #FFF7F3;
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .favorite-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     /* ========== Responsive ========== */
     @media (max-width: 640px) {
       .app-content { padding: 16px 12px; }

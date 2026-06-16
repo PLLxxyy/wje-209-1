@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { User, Meetup, RESTAURANT_TYPES, STATUS_MAP, Page } from '../types';
-import { apiGetMeetups } from '../api';
+import { apiGetMeetups, apiFavoriteMeetup, apiUnfavoriteMeetup } from '../api';
 
 interface Props {
   user: User | null;
@@ -37,6 +37,22 @@ export default function Square({ user, onNavigate }: Props) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     loadMeetups();
+  };
+
+  const handleToggleFavorite = async (e: React.MouseEvent, meetupId: number, currentFav: number | undefined) => {
+    e.stopPropagation();
+    if (!user) { onNavigate('login'); return; }
+    try {
+      if (currentFav) {
+        await apiUnfavoriteMeetup(meetupId);
+        setMeetups(prev => prev.map(m => m.id === meetupId ? { ...m, is_favorited: 0 } : m));
+      } else {
+        await apiFavoriteMeetup(meetupId);
+        setMeetups(prev => prev.map(m => m.id === meetupId ? { ...m, is_favorited: 1 } : m));
+      }
+    } catch (err: any) {
+      console.error('收藏操作失败:', err.message);
+    }
   };
 
   const formatDate = (dt: string) => {
@@ -110,7 +126,16 @@ export default function Square({ user, onNavigate }: Props) {
               <div key={m.id} className="meetup-card" onClick={() => onNavigate('detail', m.id)}>
                 <div className="card-header">
                   <div className="card-title">{m.title}</div>
-                  <span className={`tag tag-${m.status}`}>{STATUS_MAP[m.status]}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                      className={`favorite-btn ${m.is_favorited ? 'favorited' : ''}`}
+                      onClick={(e) => handleToggleFavorite(e, m.id, m.is_favorited)}
+                      title={m.is_favorited ? '取消收藏' : '收藏'}
+                    >
+                      {m.is_favorited ? '⭐' : '☆'}
+                    </button>
+                    <span className={`tag tag-${m.status}`}>{STATUS_MAP[m.status]}</span>
+                  </div>
                 </div>
                 <div className="card-meta">
                   <span className="meta-item">

@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default function Profile({ user, onNavigate }: Props) {
-  const [stats, setStats] = useState<UserStats>({ created_count: 0, joined_count: 0, total_spent: 0 });
+  const [stats, setStats] = useState<UserStats>({ created_count: 0, joined_count: 0, favorited_count: 0, total_spent: 0 });
   const [created, setCreated] = useState<Meetup[]>([]);
   const [joined, setJoined] = useState<Meetup[]>([]);
   const [activeTab, setActiveTab] = useState<'created' | 'joined'>('created');
@@ -111,7 +111,7 @@ export default function Profile({ user, onNavigate }: Props) {
         <div className="profile-username">@{user.username}</div>
       </div>
 
-      <div className="stats-grid">
+      <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
         <div className="stat-card">
           <div className="stat-value">{stats.created_count}</div>
           <div className="stat-label">发起饭局</div>
@@ -119,6 +119,14 @@ export default function Profile({ user, onNavigate }: Props) {
         <div className="stat-card">
           <div className="stat-value">{stats.joined_count}</div>
           <div className="stat-label">参加饭局</div>
+        </div>
+        <div
+          className="stat-card"
+          style={{ cursor: 'pointer' }}
+          onClick={() => onNavigate('favorites')}
+        >
+          <div className="stat-value">{stats.favorited_count}</div>
+          <div className="stat-label">⭐ 收藏饭局</div>
         </div>
         <div className="stat-card">
           <div className="stat-value">¥{stats.total_spent}</div>

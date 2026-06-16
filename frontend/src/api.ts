@@ -108,3 +108,15 @@ export async function apiGetMyCreated() {
 export async function apiGetMyJoined() {
   return request<{ meetups: import('./types').Meetup[] }>('/users/me/joined');
 }
+
+export async function apiGetMyFavorites() {
+  return request<{ meetups: import('./types').Meetup[] }>('/users/me/favorites');
+}
+
+export async function apiFavoriteMeetup(meetupId: number) {
+  return request<{ message: string }>(`/users/me/favorites/${meetupId}`, { method: 'POST' });
+}
+
+export async function apiUnfavoriteMeetup(meetupId: number) {
+  return request<{ message: string }>(`/users/me/favorites/${meetupId}`, { method: 'DELETE' });
+}

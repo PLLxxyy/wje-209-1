@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { User, Meetup, Participant, STATUS_MAP, Page } from '../types';
-import { apiGetMeetup, apiJoinMeetup, apiLeaveMeetup, apiRecordExpense, apiConfirmPayment } from '../api';
+import { apiGetMeetup, apiJoinMeetup, apiLeaveMeetup, apiRecordExpense, apiConfirmPayment, apiFavoriteMeetup, apiUnfavoriteMeetup } from '../api';
 
 interface Props {
   meetupId: number;
@@ -91,6 +91,23 @@ export default function MeetupDetail({ meetupId, user, onNavigate }: Props) {
     }
   };
 
+  const handleToggleFavorite = async () => {
+    if (!user) { onNavigate('login'); return; }
+    setActionLoading(true);
+    try {
+      if (meetup?.is_favorited) {
+        await apiUnfavoriteMeetup(meetupId);
+      } else {
+        await apiFavoriteMeetup(meetupId);
+      }
+      await loadData();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const formatDate = (dt: string) => {
     const d = new Date(dt);
     return d.toLocaleString('zh-CN', {
@@ -140,9 +157,21 @@ export default function MeetupDetail({ meetupId, user, onNavigate }: Props) {
 
       <div className="detail-card">
         <div className="detail-header">
-          <div className="detail-tags">
-            <span className="tag tag-type">{meetup.restaurant_type}</span>
-            <span className={`tag tag-${meetup.status}`}>{STATUS_MAP[meetup.status]}</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div className="detail-tags">
+              <span className="tag tag-type">{meetup.restaurant_type}</span>
+              <span className={`tag tag-${meetup.status}`}>{STATUS_MAP[meetup.status]}</span>
+            </div>
+            {user && (
+              <button
+                className={`favorite-btn ${meetup.is_favorited ? 'favorited' : ''}`}
+                onClick={handleToggleFavorite}
+                disabled={actionLoading}
+                title={meetup.is_favorited ? '取消收藏' : '收藏'}
+              >
+                {meetup.is_favorited ? '⭐ 已收藏' : '☆ 收藏'}
+              </button>
+            )}
           </div>
           <h1>{meetup.title}</h1>
           <div style={{ fontSize: '14px', color: 'var(--text-secondary)', marginTop: '4px' }}>

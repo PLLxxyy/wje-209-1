@@ -1,20 +1,34 @@
 import { Router, Response } from 'express';
 import db from './database';
-import { authMiddleware, AuthRequest } from './middleware';
+import { authMiddleware, optionalAuthMiddleware, AuthRequest } from './middleware';
 
 const router = Router();
 
 // 获取饭局列表（广场）
-router.get('/', (req: AuthRequest, res: Response) => {
+router.get('/', optionalAuthMiddleware, (req: AuthRequest, res: Response) => {
   const { status, type, search } = req.query;
+  const userId = req.userId;
   let sql = `
     SELECT m.*, u.nickname as creator_name, u.avatar as creator_avatar,
            (SELECT COUNT(*) FROM participants WHERE meetup_id = m.id) as current_participants
+  `;
+  if (userId) {
+    sql += `,
+           CASE WHEN f.id IS NOT NULL THEN 1 ELSE 0 END as is_favorited
+    `;
+  }
+  sql += `
     FROM meetups m
     JOIN users u ON m.creator_id = u.id
-    WHERE 1=1
   `;
+  if (userId) {
+    sql += ' LEFT JOIN favorites f ON f.meetup_id = m.id AND f.user_id = ?';
+  }
+  sql += ' WHERE 1=1';
   const params: any[] = [];
+  if (userId) {
+    params.push(userId);
+  }
 
   if (status && status !== 'all') {
     sql += ' AND m.status = ?';
@@ -72,12 +86,33 @@ router.post('/', authMiddleware, (req: AuthRequest, res: Response) => {
 });
 
 // 获取饭局详情
-router.get('/:id', (req: AuthRequest, res: Response) => {
-  const meetup = db.prepare(`
+router.get('/:id', optionalAuthMiddleware, (req: AuthRequest, res: Response) => {
+  const userId = req.userId;
+  let sql = `
     SELECT m.*, u.nickname as creator_name, u.avatar as creator_avatar,
            (SELECT COUNT(*) FROM participants WHERE meetup_id = m.id) as current_participants
-    FROM meetups m JOIN users u ON m.creator_id = u.id WHERE m.id = ?
-  `).get(req.params.id) as any;
+  `;
+  if (userId) {
+    sql += `,
+           CASE WHEN f.id IS NOT NULL THEN 1 ELSE 0 END as is_favorited
+    `;
+  }
+  sql += `
+    FROM meetups m
+    JOIN users u ON m.creator_id = u.id
+  `;
+  if (userId) {
+    sql += ' LEFT JOIN favorites f ON f.meetup_id = m.id AND f.user_id = ?';
+  }
+  sql += ' WHERE m.id = ?';
+
+  const params: any[] = [];
+  if (userId) {
+    params.push(userId);
+  }
+  params.push(req.params.id);
+
+  const meetup = db.prepare(sql).get(...params) as any;
 
   if (!meetup) {
     res.status(404).json({ error: '饭局不存在' });

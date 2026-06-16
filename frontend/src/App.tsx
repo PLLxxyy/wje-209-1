@@ -7,6 +7,7 @@ import Square from './pages/Square';
 import CreateMeetup from './pages/CreateMeetup';
 import MeetupDetail from './pages/MeetupDetail';
 import Profile from './pages/Profile';
+import Favorites from './pages/Favorites';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -72,6 +73,9 @@ export default function App() {
       case 'profile':
         if (!user) return <Login onAuth={handleAuth} onSwitch={() => setPage('register')} />;
         return <Profile user={user} onNavigate={navigate} />;
+      case 'favorites':
+        if (!user) return <Login onAuth={handleAuth} onSwitch={() => setPage('register')} />;
+        return <Favorites user={user} onNavigate={navigate} />;
       case 'square':
       default:
         return <Square user={user} onNavigate={navigate} />;
@@ -99,6 +103,12 @@ export default function App() {
                 onClick={() => navigate('create')}
               >
                 发起饭局
+              </button>
+              <button
+                className={`nav-link ${page === 'favorites' ? 'active' : ''}`}
+                onClick={() => navigate('favorites')}
+              >
+                ⭐ 我的收藏
               </button>
               <button
                 className={`nav-link ${page === 'profile' ? 'active' : ''}`}

@@ -24,6 +24,8 @@ export interface Meetup {
   created_at: string;
   confirmed_payment?: number;
   my_joined_at?: string;
+  is_favorited?: number;
+  favorited_at?: string;
 }
 
 export interface Participant {
@@ -38,10 +40,11 @@ export interface Participant {
 export interface UserStats {
   created_count: number;
   joined_count: number;
+  favorited_count: number;
   total_spent: number;
 }
 
-export type Page = 'square' | 'detail' | 'create' | 'profile' | 'login' | 'register';
+export type Page = 'square' | 'detail' | 'create' | 'profile' | 'favorites' | 'login' | 'register';
 
 export const RESTAURANT_TYPES = ['火锅', '烧烤', '日料', '西餐', '家常菜', '湘菜', '川菜', '粤菜', '东北菜', '东南亚菜'];
 
