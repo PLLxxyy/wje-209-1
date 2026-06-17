@@ -10,14 +10,17 @@ interface Props {
 export default function Favorites({ user, onNavigate }: Props) {
   const [favorites, setFavorites] = useState<Meetup[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const loadFavorites = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await apiGetMyFavorites();
       setFavorites(data.meetups);
-    } catch (err) {
+    } catch (err: any) {
       console.error('加载收藏列表失败:', err);
+      setError(err.message || '加载失败，请稍后重试');
     } finally {
       setLoading(false);
     }
@@ -51,6 +54,36 @@ export default function Favorites({ user, onNavigate }: Props) {
     return <div className="loading-spinner">加载中...</div>;
   }
 
+  if (error) {
+    return (
+      <div>
+        <div className="page-title">
+          <div className="title-text">
+            <span role="img" aria-label="star">⭐</span>
+            我的收藏
+          </div>
+        </div>
+        <div
+          className="empty-state"
+          data-testid="favorites-error"
+          style={{ background: '#FFF3F0', borderRadius: '12px', margin: '0 auto', maxWidth: '480px' }}
+        >
+          <div className="empty-icon">😢</div>
+          <div className="empty-text" style={{ color: 'var(--danger)' }}>加载失败</div>
+          <div className="empty-sub" data-testid="favorites-error-message">{error}</div>
+          <button
+            className="btn btn-primary"
+            style={{ marginTop: '16px' }}
+            onClick={loadFavorites}
+            data-testid="favorites-retry-btn"
+          >
+            重新加载
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="page-title">
@@ -58,13 +91,13 @@ export default function Favorites({ user, onNavigate }: Props) {
           <span role="img" aria-label="star">⭐</span>
           我的收藏
         </div>
-        <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+        <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }} data-testid="favorites-count">
           共 {favorites.length} 个收藏的饭局
         </div>
       </div>
 
       {favorites.length === 0 ? (
-        <div className="empty-state">
+        <div className="empty-state" data-testid="favorites-empty">
           <div className="empty-icon">📌</div>
           <div className="empty-text">还没有收藏任何饭局</div>
           <div className="empty-sub">去组局广场看看，发现感兴趣的饭局收藏起来吧</div>
@@ -73,7 +106,7 @@ export default function Favorites({ user, onNavigate }: Props) {
           </button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }} data-testid="favorites-list">
           {favorites.map((m) => {
             const pct = Math.min(100, Math.round((m.current_participants / m.max_participants) * 100));
             return (

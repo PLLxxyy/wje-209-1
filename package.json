@@ -9,7 +9,8 @@
     "build": "cd backend && npm run build && cd ../frontend && npm run build",
     "dev:backend": "cd backend && PORT=3209 npm run dev",
     "dev:frontend": "cd frontend && VITE_PORT=5209 VITE_API_PORT=3209 npm run dev",
-    "start": "cd backend && PORT=3209 npm run start"
+    "start": "cd backend && PORT=3209 npm run start",
+    "test": "cd frontend && npm test"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
